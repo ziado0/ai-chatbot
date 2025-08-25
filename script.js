@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const handleSendMessage = async () => {
+        // --- THIS IS THE TEST LINE ---
+        console.log("Send button was clicked or Enter was pressed.");
+
         const userText = userInput.value.trim();
         if (userText === "") return;
 
