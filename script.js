@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // We will replace this placeholder URL later.
-    const WORKER_URL = 'gemini-rapidapi-proxy.ziadforgemini.workers.dev';
+    // This URL has been corrected.
+    const WORKER_URL = 'https://gemini-rapidapi-proxy.ziadforgemini.workers.dev';
 
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
@@ -75,5 +75,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     endChatBtn.addEventListener('click', clearChat);
-
 });
