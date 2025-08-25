@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // This URL has been corrected.
+    // Double-check that this is your correct worker URL
     const WORKER_URL = 'https://gemini-rapidapi-proxy.ziadforgemini.workers.dev';
 
     const chatBox = document.getElementById('chat-box');
@@ -42,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                throw new Error(`API Error: ${response.statusText}`);
+                const errorData = await response.json();
+                throw new Error(`API Error: ${errorData.error}`);
             }
 
             const data = await response.json();
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             chatBox.removeChild(typingIndicator);
-            addMessage('Sorry, something went wrong. Please try again.', 'bot');
+            addMessage(`Sorry, something went wrong: ${error.message}`, 'bot');
             console.error('Error:', error);
         } finally {
             sendBtn.disabled = false;
