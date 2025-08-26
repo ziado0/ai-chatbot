@@ -1,36 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Internal Q&A Chatbot (DeepSeek)</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work AI Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chat-container { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+        #chat-messages { margin-bottom: 10px; }
+        .message { margin: 5px 0; padding: 5px; border-radius: 5px; }
+        .user { background-color: #e0f7fa; text-align: right; }
+        .bot { background-color: #f1f1f1; text-align: left; }
+        #user-input { width: 80%; padding: 5px; }
+        button { padding: 5px 10px; }
+    </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="chat-header">
-      <h2>Internal Support Bot</h2>
-      <button id="end-chat-btn">End & Clear Chat</button>
+    <h1>Work AI Chatbot (Project Mgmt, Finance, Admin)</h1>
+    <div id="chat-container">
+        <div id="chat-messages"></div>
     </div>
-    <div id="chat-box">
-      <div class="chat-message bot-message">
-        <p>
-          Hello! I am an AI assistant powered by DeepSeek. I can answer
-          questions about administration, project management, and finance.
-          How can I help you today?
-        </p>
-      </div>
-    </div>
-    <div id="input-container">
-      <input
-        type="text"
-        id="user-input"
-        placeholder="Type your question here..."
-        autocomplete="off"
-      />
-      <button id="send-btn">Send</button>
-    </div>
-  </div>
-  <script src="script.js"></script>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const apiKey = 'sk-0e0233e41b6b444fade3f3d3b8bba4af'; // Replace with your actual key
+        const apiUrl = 'https://api.deepseek.com/chat/completions';
+        const model = 'deepseek-chat'; // You can change to 'deepseek-reasoner' for more thoughtful responses
+        let conversationHistory = [
+            { role: 'system', content: 'You are an AI assistant specialized in project management, finance, administration, and other work-related tasks. Provide helpful, concise advice without saving any data.' }
+        ];
+
+        function addMessage(content, isUser) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', isUser ? 'user' : 'bot');
+            messageDiv.textContent = content;
+            messagesDiv.appendChild(messageDiv);
+            document.getElementById('chat-container').scrollTop = document.getElementById('chat-container').scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value;
+            if (!userInput) return;
+
+            addMessage(userInput, true);
+            document.getElementById('user-input').value = '';
+
+            conversationHistory.push({ role: 'user', content: userInput });
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: conversationHistory,
+                        stream: false
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+                const botReply = data.choices[0].message.content;
+                addMessage(botReply, false);
+                conversationHistory.push({ role: 'assistant', content: botReply });
+            } catch (error) {
+                addMessage('Error: Could not get response. Check your API key or internet.', false);
+            }
+        }
+    </script>
 </body>
 </html>
